@@ -129,15 +129,21 @@ class Money
     #     +Money.new+ is called without an explicit currency argument. The
     #     default value is Currency.new("USD"). The value must be a valid
     #     +Money::Currency+ instance.
-    attr_writer :rounding_mode, :default_currency
+    attr_writer :rounding_mode
 
   end
 
+  def self.default_currency=(default_currency)
+    Thread.current[:money_default_currency] = default_currency
+  end
+
   def self.default_currency
-    if @default_currency.respond_to?(:call)
-      Money::Currency.new(@default_currency.call)
+    default_currency = Thread.current[:money_default_currency]
+
+    if default_currency.respond_to?(:call)
+      Money::Currency.new(default_currency.call)
     else
-      Money::Currency.new(@default_currency)
+      Money::Currency.new(default_currency)
     end
   end
 
